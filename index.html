@@ -9,7 +9,6 @@
             --bg-dark: #0f0c1b;
             --card-bg: #1a162b;
             --accent: #8b5cf6;
-            --accent-hover: #7c3aed;
             --text-main: #f3f4f6;
             --text-muted: #9ca3af;
             --border: #2e2846;
@@ -58,6 +57,7 @@
             margin-bottom: 20px;
             justify-content: center;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .btn {
@@ -96,7 +96,7 @@
 
         .sync-badge {
             font-size: 0.85rem;
-            padding: 4px 10px;
+            padding: 6px 12px;
             border-radius: 20px;
             background: rgba(16, 185, 129, 0.1);
             color: var(--success);
@@ -126,10 +126,6 @@
             box-shadow: 0 0 12px rgba(139, 92, 246, 0.3);
         }
 
-        .subject-card h3 {
-            font-size: 0.95rem;
-        }
-
         .content-panel {
             background: var(--card-bg);
             border: 1px solid var(--border);
@@ -154,7 +150,6 @@
             cursor: pointer;
             padding: 8px 16px;
             border-radius: 6px;
-            transition: all 0.2s ease;
         }
 
         .tab-btn.active {
@@ -186,9 +181,9 @@
 
         .editable-active {
             border: 1px dashed var(--accent) !important;
-            padding: 4px;
+            padding: 6px;
             border-radius: 4px;
-            background: rgba(139, 92, 246, 0.05);
+            background: rgba(139, 92, 246, 0.1);
         }
     </style>
 </head>
@@ -197,12 +192,13 @@
 <div class="container">
     <header>
         <h1>B.Tech CSE (AI) - Syllabus Portal</h1>
-        <p>Real-time Collaborative Academic Portal</p>
+        <p>Offline & Auto-Saved Academic Portal</p>
     </header>
 
     <div class="controls-bar">
         <button class="btn" id="edit-toggle-btn" onclick="toggleEditMode()">✏️ Edit Mode: OFF</button>
-        <span class="sync-badge" id="sync-status">🟢 Ready</span>
+        <button class="btn btn-danger" onclick="resetToDefault()">🔄 Reset Data</button>
+        <span class="sync-badge" id="sync-status">💾 Local Auto-Save Active</span>
     </div>
 
     <div class="subject-grid">
@@ -234,149 +230,124 @@
     </div>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
-
-    const firebaseConfig = {
-        databaseURL: "https://syllabus-sessional-1-default-rtdb.asia-southeast1.firebasedatabase.app"
-    };
-
+<script>
     const defaultData = {
         physics: {
             syllabus: [
-                { title: "Unit 1: Mechanics (09 Hours)", details: "Newton's Laws, Potential energy function, F = - Grad V, Conservative and non-conservative forces, Harmonic oscillator, Damped harmonic motion (over-damped, critically damped, lightly-damped), Forced oscillations and resonance." },
-                { title: "Unit 2: Electromagnetic Theory (09 Hours)", details: "Calculation of electric field for charge distribution, Bound charges due to electric polarization, Electric displacement, Ampere's Law, Inconsistency in Ampere's law, Continuity equation, Maxwell's equations (differential and integral form), Wave equation in vacuum and non-conducting medium." },
-                { title: "Unit 3: Quantum Mechanics (09 Hours)", details: "Introduction to Quantum mechanics, Wave nature of Particles, Time-dependent and time independent Schrodinger equation, Born interpretation, Expectation values, Wave-packets, Uncertainty principle, Particle in a 1D box, Tunneling effect." },
-                { title: "Unit 4: Wave Optics (09 Hours)", details: "Huygens' Principle, Superposition of waves & interference (wave front & amplitude splitting), Young's double slit experiment, Newton's rings, Fraunhofer diffraction (single slit), Diffraction gratings and resolving power." },
-                { title: "Unit 5: Lasers (09 Hours)", details: "Einstein's A and B coefficients, Amplification of light by population inversion, Gas lasers (He-Ne), Solid-state lasers (Ruby), Laser properties (monochromaticity, coherence, directionality, brightness), Applications." }
+                { title: "Unit 1: Mechanics (09 Hours)", details: "Newton's Laws, Potential energy function, F = - Grad V, Conservative and non-conservative forces, Harmonic oscillator, Damped harmonic motion, Forced oscillations and resonance." },
+                { title: "Unit 2: Electromagnetic Theory (09 Hours)", details: "Electric field, Bound charges, Electric displacement, Ampere's Law, Continuity equation, Maxwell's equations, Wave equation in vacuum." },
+                { title: "Unit 3: Quantum Mechanics (09 Hours)", details: "Wave nature of Particles, Schrodinger equation, Born interpretation, Expectation values, Uncertainty principle, Particle in a 1D box." },
+                { title: "Unit 4: Wave Optics (09 Hours)", details: "Huygens' Principle, Superposition of waves, Interference, Newton's rings, Single slit diffraction, Diffraction gratings." },
+                { title: "Unit 5: Lasers (09 Hours)", details: "Einstein's A and B coefficients, Population inversion, He-Ne laser, Ruby laser, Laser applications." }
             ],
-            topics: [
-                { title: "High Yield Exam Topics", details: "1D Schrodinger Box Problem, Maxwell's Equations Derivation, Newton's Rings Numericals, He-Ne Laser Working, Damped & Forced Oscillations." }
-            ]
+            topics: [{ title: "High Yield Topics", details: "Schrodinger 1D Box, Maxwell Equations, Newton's Rings, He-Ne Laser." }]
         },
         maths: {
             syllabus: [
-                { title: "Unit I: Calculus-I (10 Hours)", details: "Evolutes and involutes, Evaluation of definite and improper integrals, Beta and Gamma functions and properties, Applications of definite integrals (surface areas and volumes of revolutions)." },
-                { title: "Unit II: Calculus-II (10 Hours)", details: "Rolle's Theorem, Mean value theorems, Taylor's and Maclaurin theorems with remainders, Indeterminate forms, L'Hospital's rule, Maxima and minima." },
-                { title: "Unit III: Sequences and Series (10 Hours)", details: "Convergence of sequence and series, Tests for convergence, Power series, Taylor's series, Trigonometric/logarithm series, Fourier series (Half range sine/cosine series, Parseval's theorem)." },
-                { title: "Unit IV: Multivariable Calculus (10 Hours)", details: "Limit, continuity, partial derivatives, Directional derivatives, Total derivative, Tangent plane and normal line, Maxima, minima & saddle points, Lagrange multipliers, Gradient, curl, and divergence." },
-                { title: "Unit V: Matrices (08 Hours)", details: "Inverse and rank of a matrix, Rank-nullity theorem, System of linear equations, Symmetric, skew-symmetric and orthogonal matrices, Eigenvalues & eigenvectors, Diagonalization, Cayley-Hamilton Theorem." }
+                { title: "Unit I: Calculus-I (10 Hours)", details: "Evolutes and involutes, Beta and Gamma functions, Surface areas and volumes." },
+                { title: "Unit II: Calculus-II (10 Hours)", details: "Rolle's Theorem, Mean value theorems, Taylor's & Maclaurin theorems, L'Hospital's rule." },
+                { title: "Unit III: Sequences and Series (10 Hours)", details: "Convergence tests, Power series, Fourier series." },
+                { title: "Unit IV: Multivariable Calculus (10 Hours)", details: "Partial derivatives, Total derivative, Maxima & minima, Lagrange multipliers." },
+                { title: "Unit V: Matrices (08 Hours)", details: "Rank of matrix, Linear equations, Eigenvalues & Eigenvectors, Cayley-Hamilton Theorem." }
             ],
-            topics: [
-                { title: "High Yield Exam Topics", details: "Cayley-Hamilton Theorem, Eigenvalues & Eigenvectors, Beta & Gamma Function Integrals, Fourier Series Expansion, Lagrange Multipliers." }
-            ]
+            topics: [{ title: "High Yield Topics", details: "Cayley-Hamilton Theorem, Eigenvalues, Beta/Gamma Integrals, Fourier Series." }]
         },
         electrical: {
             syllabus: [
-                { title: "Unit 1: DC Circuits (09 Hours)", details: "Electrical circuit elements (R, L, C), Voltage and current sources, Series & parallel circuits, KVL and KCL, Power and energy, Superposition, Thevenin and Norton Theorems." },
-                { title: "Unit 2: AC Circuits (09 Hours)", details: "Sinusoidal waveforms, RMS and average values, Form factor, Peak factor, Phasor representation, Real, reactive, apparent power, Resonance (series/parallel), 3-phase balanced circuits (star & delta)." },
-                { title: "Unit 3: Transformers (09 Hours)", details: "Principle of operation & construction of single-phase transformers (core and shell type), Losses, Efficiency, Voltage regulation, B-H characteristics, Self/mutual inductance." },
-                { title: "Unit 4: Electrical Machines (09 Hours)", details: "Rotating magnetic fields, Single-phase and three-phase induction motor working, Torque-slip characteristic, DC motors (types, characteristics, application, necessity of starter)." },
-                { title: "Unit 5: Power Source (09 Hours)", details: "Wind, Solar, Fuel cell, Tidal, Geo-Thermal, Hydroelectric, Thermal, Nuclear power plants, Battery types and characteristics." }
+                { title: "Unit 1: DC Circuits (09 Hours)", details: "R, L, C elements, KVL & KCL, Superposition, Thevenin & Norton Theorems." },
+                { title: "Unit 2: AC Circuits (09 Hours)", details: "Sinusoidal waveforms, RMS values, Phasor representation, Real & Reactive power, Resonance." },
+                { title: "Unit 3: Transformers (09 Hours)", details: "Single-phase transformers, Losses, Efficiency, Voltage regulation." },
+                { title: "Unit 4: Electrical Machines (09 Hours)", details: "Induction motor working, Torque-slip characteristic, DC motor starters." },
+                { title: "Unit 5: Power Source (09 Hours)", details: "Solar, Wind, Hydroelectric, Thermal power plants, Battery types." }
             ],
-            topics: [
-                { title: "High Yield Exam Topics", details: "Thevenin & Norton Numericals, KVL/KCL Circuit Analysis, Transformer Efficiency & Losses, Star-Delta Conversion, Torque-Slip Characteristics." }
-            ]
+            topics: [{ title: "High Yield Topics", details: "Thevenin/Norton Problems, Transformer Efficiency, Star-Delta, KVL/KCL." }]
         },
         english: {
             syllabus: [
-                { title: "Unit 1: Vocabulary Building (06 Hours)", details: "Word Formation, Foreign root words, Prefixes and suffixes, Synonyms, antonyms, Standard abbreviations." },
-                { title: "Unit 2: Basic Writing Skills (06 Hours)", details: "Sentence Structures, Phrases and clauses, Punctuation, Paragraph coherence and organization, Precise writing." },
-                { title: "Unit 3: Common Errors in Writing (06 Hours)", details: "Subject-verb agreement, Noun-pronoun agreement, Misplaced modifiers, Articles, Prepositions, Redundancies, Cliches." },
-                { title: "Unit 4: Sensible Writing (06 Hours)", details: "Describing, Defining, Classifying, Providing evidence, Writing introduction and conclusion." },
-                { title: "Unit 5: Communication Practices (06 Hours)", details: "Comprehension, Précis Writing, Essay Writing, Oral Communication (Pronunciation, Intonation, Workplace Dialogues, Presentations)." }
+                { title: "Unit 1: Vocabulary Building (06 Hours)", details: "Word formation, Prefixes & Suffixes, Synonyms & Antonyms." },
+                { title: "Unit 2: Basic Writing Skills (06 Hours)", details: "Sentence structures, Paragraph coherence, Précis writing." },
+                { title: "Unit 3: Common Errors (06 Hours)", details: "Subject-verb agreement, Articles, Prepositions, Modifiers." },
+                { title: "Unit 4: Sensible Writing (06 Hours)", details: "Describing, Defining, Classifying, Writing conclusion." },
+                { title: "Unit 5: Communication Practices (06 Hours)", details: "Comprehension, Essay writing, Workplace dialogues, Presentations." }
             ],
-            topics: [
-                { title: "High Yield Exam Topics", details: "Précis & Essay Writing, Subject-Verb Agreement Rules, Correcting Common Errors, Official Email & Letter Writing." }
-            ]
+            topics: [{ title: "High Yield Topics", details: "Précis Writing, Subject-Verb Agreement, Official Letters, Correcting Errors." }]
         }
     };
 
-    let appData = defaultData;
+    let appData = {};
     let currentSubject = 'physics';
     let currentTab = 'syllabus';
     let isEditMode = false;
-    let database = null;
-    let dbRef = null;
 
-    try {
-        const app = initializeApp(firebaseConfig);
-        database = getDatabase(app);
-        dbRef = ref(database, 'syllabusData');
-
-        onValue(dbRef, (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                appData = data;
-                document.getElementById('sync-status').innerText = '🟢 Cloud Synced';
-            } else {
-                saveToFirebase();
+    // Load data from LocalStorage
+    function loadData() {
+        const saved = localStorage.getItem('btech_syllabus_data');
+        if (saved) {
+            try {
+                appData = JSON.parse(saved);
+            } catch(e) {
+                appData = defaultData;
             }
-            renderContent();
-        }, (error) => {
-            console.warn("Firebase restricted, using local data", error);
-            document.getElementById('sync-status').innerText = '🟡 Local Mode';
-            renderContent();
-        });
-    } catch (e) {
-        console.warn("Firebase Init Error:", e);
-        renderContent();
-    }
-
-    function saveToFirebase() {
-        if (dbRef) {
-            document.getElementById('sync-status').innerText = '⏳ Saving...';
-            set(dbRef, appData)
-                .then(() => {
-                    document.getElementById('sync-status').innerText = '🟢 Saved to Cloud';
-                })
-                .catch((err) => {
-                    console.error("Save error:", err);
-                    document.getElementById('sync-status').innerText = '🔴 Rule Error (Check Console)';
-                });
+        } else {
+            appData = defaultData;
+            saveData();
         }
     }
 
-    window.renderContent = function() {
-        const container = document.getElementById('content-container');
-        if (!appData || !appData[currentSubject]) return;
+    // Save data to LocalStorage
+    function saveData() {
+        localStorage.setItem('btech_syllabus_data', JSON.stringify(appData));
+        const status = document.getElementById('sync-status');
+        status.innerText = '✅ Saved locally!';
+        setTimeout(() => {
+            status.innerText = '💾 Local Auto-Save Active';
+        }, 1500);
+    }
 
-        const items = (appData[currentSubject] && appData[currentSubject][currentTab]) ? appData[currentSubject][currentTab] : [];
+    function renderContent() {
+        const container = document.getElementById('content-container');
+        if (!appData[currentSubject]) appData[currentSubject] = {};
+        if (!appData[currentSubject][currentTab]) appData[currentSubject][currentTab] = [];
+
+        const items = appData[currentSubject][currentTab];
         let html = '';
 
         items.forEach((item, index) => {
             html += `
                 <div class="unit-card">
-                    <h4 contenteditable="${isEditMode}" class="${isEditMode ? 'editable-active' : ''}" onblur="window.updateData(${index}, 'title', this.innerText)">${item.title}</h4>
-                    <p contenteditable="${isEditMode}" class="${isEditMode ? 'editable-active' : ''}" onblur="window.updateData(${index}, 'details', this.innerText)">${item.details}</p>
-                    ${isEditMode ? `<button class="btn btn-danger" style="margin-top: 10px; padding: 4px 10px; font-size: 0.8rem;" onclick="window.deleteItem(${index})">🗑️ Delete Item</button>` : ''}
+                    <h4 contenteditable="${isEditMode}" 
+                        class="${isEditMode ? 'editable-active' : ''}" 
+                        oninput="updateData(${index}, 'title', this.innerText)">${item.title}</h4>
+                    <p contenteditable="${isEditMode}" 
+                       class="${isEditMode ? 'editable-active' : ''}" 
+                       oninput="updateData(${index}, 'details', this.innerText)">${item.details}</p>
+                    ${isEditMode ? `<button class="btn btn-danger" style="margin-top:10px; padding:4px 10px; font-size:0.8rem;" onclick="deleteItem(${index})">🗑️ Delete</button>` : ''}
                 </div>
             `;
         });
 
         if (items.length === 0) {
-            html = '<p style="color: var(--text-muted);">No content available. Switch ON Edit Mode to add content.</p>';
+            html = '<p style="color: var(--text-muted);">Khali hai! Edit Mode ON karke naya add karein.</p>';
         }
 
         container.innerHTML = html;
-    };
+    }
 
-    window.selectSubject = function(subject, element) {
+    function selectSubject(subject, el) {
         currentSubject = subject;
-        document.querySelectorAll('.subject-card').forEach(el => el.classList.remove('active'));
-        element.classList.add('active');
+        document.querySelectorAll('.subject-card').forEach(card => card.classList.remove('active'));
+        el.classList.add('active');
         renderContent();
-    };
+    }
 
-    window.switchTab = function(tab, element) {
+    function switchTab(tab, el) {
         currentTab = tab;
-        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-        element.classList.add('active');
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        el.classList.add('active');
         renderContent();
-    };
+    }
 
-    window.toggleEditMode = function() {
+    function toggleEditMode() {
         isEditMode = !isEditMode;
         const btn = document.getElementById('edit-toggle-btn');
         const adminControls = document.getElementById('admin-controls');
@@ -391,36 +362,40 @@
             adminControls.style.display = 'none';
         }
         renderContent();
-    };
+    }
 
-    window.updateData = function(index, key, val) {
-        if (appData && appData[currentSubject] && appData[currentSubject][currentTab][index]) {
-            appData[currentSubject][currentTab][index][key] = val;
-            saveToFirebase();
-        }
-    };
+    function updateData(index, key, val) {
+        appData[currentSubject][currentTab][index][key] = val;
+        saveData();
+    }
 
-    window.addNewItem = function() {
-        if (!appData[currentSubject]) appData[currentSubject] = {};
-        if (!appData[currentSubject][currentTab]) appData[currentSubject][currentTab] = [];
-        
+    function addNewItem() {
         appData[currentSubject][currentTab].push({
-            title: "New Unit / Topic Title (Click to Edit)",
-            details: "Type syllabus content or topic details here..."
+            title: "Naya Title (Ispe click karke edit karein)",
+            details: "Naya content likhein..."
         });
-        saveToFirebase();
+        saveData();
         renderContent();
-    };
+    }
 
-    window.deleteItem = function(index) {
+    function deleteItem(index) {
         if (confirm("Kya aap ise delete karna chahte hain?")) {
             appData[currentSubject][currentTab].splice(index, 1);
-            saveToFirebase();
+            saveData();
             renderContent();
         }
-    };
+    }
 
-    // First initial render
+    function resetToDefault() {
+        if (confirm("Kya aap saara data original syllabus par reset karna chahte hain?")) {
+            appData = JSON.parse(JSON.stringify(defaultData));
+            saveData();
+            renderContent();
+        }
+    }
+
+    // Init
+    loadData();
     renderContent();
 </script>
 </body>
