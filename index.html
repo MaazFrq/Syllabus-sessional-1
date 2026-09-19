@@ -9,6 +9,7 @@
             --bg-dark: #0f0c1b;
             --card-bg: #1a162b;
             --accent: #8b5cf6;
+            --accent-hover: #7c3aed;
             --text-main: #f3f4f6;
             --text-muted: #9ca3af;
             --border: #2e2846;
@@ -126,6 +127,10 @@
             box-shadow: 0 0 12px rgba(139, 92, 246, 0.3);
         }
 
+        .subject-card h3 {
+            font-size: 0.95rem;
+        }
+
         .content-panel {
             background: var(--card-bg);
             border: 1px solid var(--border);
@@ -192,13 +197,12 @@
 <div class="container">
     <header>
         <h1>B.Tech CSE (AI) - Syllabus Portal</h1>
-        <p>Offline & Auto-Saved Academic Portal</p>
+        <p>Global Real-Time Academic Portal</p>
     </header>
 
     <div class="controls-bar">
         <button class="btn" id="edit-toggle-btn" onclick="toggleEditMode()">✏️ Edit Mode: OFF</button>
-        <button class="btn btn-danger" onclick="resetToDefault()">🔄 Reset Data</button>
-        <span class="sync-badge" id="sync-status">💾 Local Auto-Save Active</span>
+        <span class="sync-badge" id="sync-status">🟢 Syncing...</span>
     </div>
 
     <div class="subject-grid">
@@ -230,7 +234,21 @@
     </div>
 </div>
 
-<script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBDr7LzpZGwGSP6KAl5gqdK1-sBavjdYhc",
+      authDomain: "syllabus-b899e.firebaseapp.com",
+      databaseURL: "https://syllabus-b899e-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "syllabus-b899e",
+      storageBucket: "syllabus-b899e.firebasestorage.app",
+      messagingSenderId: "105180350358",
+      appId: "1:105180350358:web:31fb7c5c41ddb410273fb7",
+      measurementId: "G-DYYW1SH4XB"
+    };
+
     const defaultData = {
         physics: {
             syllabus: [
@@ -278,76 +296,85 @@
     let currentSubject = 'physics';
     let currentTab = 'syllabus';
     let isEditMode = false;
+    let database = null;
+    let dbRef = null;
 
-    // Load data from LocalStorage
-    function loadData() {
-        const saved = localStorage.getItem('btech_syllabus_data');
-        if (saved) {
-            try {
-                appData = JSON.parse(saved);
-            } catch(e) {
+    try {
+        const app = initializeApp(firebaseConfig);
+        database = getDatabase(app);
+        dbRef = ref(database, 'syllabusData');
+
+        onValue(dbRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                appData = data;
+                document.getElementById('sync-status').innerText = '🟢 Cloud Synced';
+            } else {
                 appData = defaultData;
+                saveToFirebase();
             }
-        } else {
-            appData = defaultData;
-            saveData();
+            renderContent();
+        }, (error) => {
+            console.warn("Sync Error:", error);
+            document.getElementById('sync-status').innerText = '🔴 Sync Failed';
+        });
+    } catch (e) {
+        console.error("Init Error:", e);
+    }
+
+    function saveToFirebase() {
+        if (dbRef && appData) {
+            document.getElementById('sync-status').innerText = '⏳ Saving...';
+            set(dbRef, appData)
+                .then(() => {
+                    document.getElementById('sync-status').innerText = '🟢 Saved to Cloud';
+                })
+                .catch((err) => {
+                    console.error("Save error:", err);
+                    document.getElementById('sync-status').innerText = '🔴 Save Failed';
+                });
         }
     }
 
-    // Save data to LocalStorage
-    function saveData() {
-        localStorage.setItem('btech_syllabus_data', JSON.stringify(appData));
-        const status = document.getElementById('sync-status');
-        status.innerText = '✅ Saved locally!';
-        setTimeout(() => {
-            status.innerText = '💾 Local Auto-Save Active';
-        }, 1500);
-    }
-
-    function renderContent() {
+    window.renderContent = function() {
         const container = document.getElementById('content-container');
-        if (!appData[currentSubject]) appData[currentSubject] = {};
-        if (!appData[currentSubject][currentTab]) appData[currentSubject][currentTab] = [];
+        if (!appData || !appData[currentSubject]) return;
 
-        const items = appData[currentSubject][currentTab];
+        const items = (appData[currentSubject] && appData[currentSubject][currentTab]) ? appData[currentSubject][currentTab] : [];
         let html = '';
 
         items.forEach((item, index) => {
             html += `
                 <div class="unit-card">
-                    <h4 contenteditable="${isEditMode}" 
-                        class="${isEditMode ? 'editable-active' : ''}" 
-                        oninput="updateData(${index}, 'title', this.innerText)">${item.title}</h4>
-                    <p contenteditable="${isEditMode}" 
-                       class="${isEditMode ? 'editable-active' : ''}" 
-                       oninput="updateData(${index}, 'details', this.innerText)">${item.details}</p>
-                    ${isEditMode ? `<button class="btn btn-danger" style="margin-top:10px; padding:4px 10px; font-size:0.8rem;" onclick="deleteItem(${index})">🗑️ Delete</button>` : ''}
+                    <h4 contenteditable="${isEditMode}" class="${isEditMode ? 'editable-active' : ''}" onblur="window.updateData(${index}, 'title', this.innerText)">${item.title}</h4>
+                    <p contenteditable="${isEditMode}" class="${isEditMode ? 'editable-active' : ''}" onblur="window.updateData(${index}, 'details', this.innerText)">${item.details}</p>
+                    ${isEditMode ? `<button class="btn btn-danger" style="margin-top: 10px; padding: 4px 10px; font-size: 0.8rem;" onclick="window.deleteItem(${index})">🗑️ Delete Item</button>` : ''}
                 </div>
             `;
         });
 
         if (items.length === 0) {
-            html = '<p style="color: var(--text-muted);">Khali hai! Edit Mode ON karke naya add karein.</p>';
+            html = '<p style="color: var(--text-muted);">No content available. Switch ON Edit Mode to add content.</p>';
         }
 
         container.innerHTML = html;
-    }
+    };
 
-    function selectSubject(subject, el) {
+    window.selectSubject = function(subject, element) {
         currentSubject = subject;
-        document.querySelectorAll('.subject-card').forEach(card => card.classList.remove('active'));
-        el.classList.add('active');
+        document.querySelectorAll('.subject-card').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
         renderContent();
-    }
+    };
 
-    function switchTab(tab, el) {
+    window.switchTab = function(tab, element) {
         currentTab = tab;
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        el.classList.add('active');
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
         renderContent();
-    }
+    };
 
-    function toggleEditMode() {
+    window.toggleEditMode = function() {
         isEditMode = !isEditMode;
         const btn = document.getElementById('edit-toggle-btn');
         const adminControls = document.getElementById('admin-controls');
@@ -362,41 +389,34 @@
             adminControls.style.display = 'none';
         }
         renderContent();
-    }
+    };
 
-    function updateData(index, key, val) {
-        appData[currentSubject][currentTab][index][key] = val;
-        saveData();
-    }
+    window.updateData = function(index, key, val) {
+        if (appData && appData[currentSubject] && appData[currentSubject][currentTab][index]) {
+            appData[currentSubject][currentTab][index][key] = val;
+            saveToFirebase();
+        }
+    };
 
-    function addNewItem() {
+    window.addNewItem = function() {
+        if (!appData[currentSubject]) appData[currentSubject] = {};
+        if (!appData[currentSubject][currentTab]) appData[currentSubject][currentTab] = [];
+        
         appData[currentSubject][currentTab].push({
-            title: "Naya Title (Ispe click karke edit karein)",
-            details: "Naya content likhein..."
+            title: "New Unit / Topic Title (Click to Edit)",
+            details: "Type syllabus content or topic details here..."
         });
-        saveData();
+        saveToFirebase();
         renderContent();
-    }
+    };
 
-    function deleteItem(index) {
+    window.deleteItem = function(index) {
         if (confirm("Kya aap ise delete karna chahte hain?")) {
             appData[currentSubject][currentTab].splice(index, 1);
-            saveData();
+            saveToFirebase();
             renderContent();
         }
-    }
-
-    function resetToDefault() {
-        if (confirm("Kya aap saara data original syllabus par reset karna chahte hain?")) {
-            appData = JSON.parse(JSON.stringify(defaultData));
-            saveData();
-            renderContent();
-        }
-    }
-
-    // Init
-    loadData();
-    renderContent();
+    };
 </script>
 </body>
 </html>
