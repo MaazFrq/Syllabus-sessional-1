@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Syllabus Portal</title>
     <style>
-        /* CSS Variables */
         :root {
             --bg-dark: #0f0c1b;
             --card-bg: #1a162b;
@@ -93,7 +92,6 @@
             border: none;
         }
 
-        /* Subject Selection Grid */
         .subject-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -120,7 +118,6 @@
             font-size: 1rem;
         }
 
-        /* Content Display Area */
         .content-panel {
             background: var(--card-bg);
             border: 1px solid var(--border);
@@ -172,12 +169,6 @@
             font-size: 0.95rem;
             line-height: 1.5;
         }
-
-        .editable {
-            outline: 1px dashed var(--accent);
-            padding: 4px;
-            border-radius: 4px;
-        }
     </style>
 </head>
 <body>
@@ -194,7 +185,6 @@
         <button class="btn" onclick="resetToDefault()">🔄 Reset to Default</button>
     </div>
 
-    <!-- Subject Selector -->
     <div class="subject-grid">
         <div class="subject-card active" onclick="selectSubject('physics', this)">
             <h3>Applied Physics</h3>
@@ -210,7 +200,6 @@
         </div>
     </div>
 
-    <!-- Content Panel -->
     <div class="content-panel">
         <div class="tab-buttons">
             <button class="tab-btn active" onclick="switchTab('syllabus', this)">📚 Syllabus</button>
@@ -218,7 +207,7 @@
         </div>
 
         <div id="content-container">
-            <!-- Dynamic Content Renders Here -->
+            <!-- Dynamic Content -->
         </div>
 
         <div class="admin-controls" id="admin-controls" style="display: none; margin-top: 15px;">
@@ -227,20 +216,18 @@
     </div>
 </div>
 
-<!-- Firebase Modular SDK -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
     import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
     const firebaseConfig = {
-        databaseURL: "https://syllabus-b9f9a-default-rtdb.asia-southeast1.firebasedatabase.app"
+        databaseURL: "https://syllabus-sessional-1-default-rtdb.asia-southeast1.firebasedatabase.app"
     };
 
     const app = initializeApp(firebaseConfig);
     const database = getDatabase(app);
     const dbRef = ref(database, 'syllabusData');
 
-    // Default Initial Data
     const defaultData = {
         physics: {
             syllabus: [
@@ -282,16 +269,12 @@
     let isEditMode = false;
     let appData = null;
 
-    // Save Data to Firebase
     function saveToFirebase() {
         if (appData) {
-            set(dbRef, appData).catch(error => {
-                console.error("Firebase Sync Error: ", error);
-            });
+            set(dbRef, appData).catch(error => console.error("Firebase Sync Error: ", error));
         }
     }
 
-    // Realtime Sync from Firebase
     onValue(dbRef, (snapshot) => {
         const data = snapshot.val();
         if (data) {
@@ -303,7 +286,6 @@
         renderContent();
     });
 
-    // Render Content Function
     window.renderContent = function() {
         const container = document.getElementById('content-container');
         if (!appData || !appData[currentSubject]) return;
@@ -328,7 +310,6 @@
         container.innerHTML = html;
     };
 
-    // Global Functions for UI Interaction
     window.selectSubject = function(subject, element) {
         currentSubject = subject;
         document.querySelectorAll('.subject-card').forEach(el => el.classList.remove('active'));
