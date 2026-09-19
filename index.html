@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B.Tech CSE (AI) Semester 1 Syllabus</title>
+    <style>
+        /* Black and Purple Color Scheme */
+        :root {
+            --bg-color: #0a0a0a;         /* Deep Black */
+            --card-bg: #171717;          /* Lighter Black/Dark Gray */
+            --accent: #a855f7;           /* Bright Purple */
+            --accent-hover: #c084fc;     /* Lighter Purple */
+            --text-main: #f3f4f6;        /* Off White */
+            --text-muted: #9ca3af;       /* Light Gray */
+            --border: #262626;           /* Dark Border */
+            --success: #22c55e;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 10px;
+            max-width: 900px;
+            margin: 0 auto 20px;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            color: var(--accent);
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
+        }
+
+        header p {
+            color: var(--text-muted);
+        }
+
+        .controls-bar {
+            max-width: 900px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: var(--card-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 8px rgba(168, 85, 247, 0.3);
+        }
+
+        .btn-active {
+            background: var(--accent);
+            color: #000;
+            border-color: var(--accent);
+            font-weight: bold;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: #000;
+            font-weight: bold;
+            border: none;
+        }
+
+        /* Subject Navigation Grid */
+        .subject-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            max-width: 900px;
+            margin: 0 auto 30px;
+        }
+
+        .subject-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+            box-shadow: 0 5px 15px rgba(168, 85, 247, 0.2);
+        }
+
+        .subject-card.active {
+            border-color: var(--accent);
+            background: #1e1b4b; /* Deep Purple Tint */
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+            color: var(--accent-hover);
+        }
+
+        .subject-card h3 {
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Content Display Area */
+        .content-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 25px;
+            display: none;
+        }
+
+        .content-container.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Sub-sections (Syllabus vs Topics) */
+        .sub-nav {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            overflow-x: auto;
+        }
+
+        .sub-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1rem;
+            padding: 6px 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .sub-btn:hover {
+            color: var(--text-main);
+        }
+
+        .sub-btn.active {
+            color: var(--accent);
+            border-bottom: 2px solid var(--accent);
+            font-weight: bold;
+            text-shadow: 0 0 8px rgba(168, 85, 247, 0.4);
+        }
+
+        .section-block {
+            margin-bottom: 20px;
+            background: #0a0a0a;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 3px solid var(--accent);
+            position: relative;
+        }
+
+        .section-block h4 {
+            color: var(--accent-hover);
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .section-block p, .section-block ul {
+            color: var(--text-main);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            padding-left: 10px;
+        }
+
+        /* Editable Controls */
+        [contenteditable="true"] {
+            outline: 1px dashed var(--accent);
+            padding: 4px;
+            border-radius: 4px;
+            background: rgba(168, 85, 247, 0.05);
+        }
+
+        .admin-controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .delete-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.2s;
+        }
+        
+        .delete-btn:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>B.Tech CSE (AI) - Semester 1</h1>
+        <p>Syllabus & Important Topics Portal</p>
+    </header>
+
+    <div class="controls-bar">
+        <button class="btn" id="edit-toggle-btn" onclick="toggleEditMode()">✏️ Edit Mode: OFF</button>
+        <button class="btn" onclick="exportData()">📥 Export Data (JSON)</button>
+        <button class="btn" onclick="resetDefault()">🔄 Reset to Default</button>
+    </div>
+
+    <!-- Subject Selector -->
+    <div class="subject-grid">
+        <div class="subject-card" onclick="selectSubject('physics', this)">
+            <h3>Applied Physics</h3>
+        </div>
+        <div class="subject-card" onclick="selectSubject('maths', this)">
+            <h3>Mathematics-I</h3>
+        </div>
+        <div class="subject-card" onclick="selectSubject('english', this)">
+            <h3>English</h3>
+        </div>
+        <div class="subject-card" onclick="selectSubject('electrical', this)">
+            <h3>Basic Electrical</h3>
+        </div>
+    </div>
+
+    <!-- Content Panel -->
+    <div id="content-panel" class="content-container">
+        <div class="sub-nav">
+            <button class="sub-btn active" onclick="switchSubTab('syllabus', this)">📚 Syllabus</button>
+            <button class="sub-btn" onclick="switchSubTab('topics', this)">⭐ Important Topics</button>
+        </div>
+
+        <div id="tab-syllabus" class="tab-content"></div>
+        <div id="tab-topics" class="tab-content" style="display: none;"></div>
+
+        <div class="admin-controls" id="add-btn-container" style="display: none;">
+            <button class="btn btn-success" onclick="addNewBlock()">+ Add New Topic/Unit</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK Modules -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBDr7LzpZGwGSP6KAl5gqdK1-sBavjdYhc",
+            authDomain: "syllabus-b899e.firebaseapp.com",
+            projectId: "syllabus-b899e",
+            storageBucket: "syllabus-b899e.firebasestorage.app",
+            messagingSenderId: "105180350358",
+            appId: "1:105180350358:web:31fb7c5c41ddb410273fb7",
+            measurementId: "G-DYYW1SH4XB"
+        };
+
+        // Initialize Firebase & Realtime Database
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const syllabusRef = ref(database, 'syllabusData');
+
+        const defaultData = {
+            physics: {
+                syllabus: [
+                    { title: "Unit 1: Mechanics (9 hours)", details: "Newton's Laws, Potential energy function, Conservative and non-conservative forces, Harmonic oscillator, Damped harmonic motion, Forced oscillations and resonance." },
+                    { title: "Unit 2: Electromagnetic Theory (9 hours)", details: "Calculation of electric field, Bound charges, Ampere's Law, Continuity equation, Maxwell's equations in differential and integral form, Wave equation." },
+                    { title: "Unit 3: Quantum Mechanics (9 hours)", details: "Introduction to Quantum mechanics, Wave nature of Particles, Time-dependent and independent Schrodinger equation, Expectation values, Uncertainty principle, particle in a box." },
+                    { title: "Unit 4: Wave Optics (9 hours)", details: "Huygens' Principle, interference of light, Young's double slit experiment, Newton's rings, Fraunhofer diffraction, Diffraction gratings." },
+                    { title: "Unit 5: Lasers (9 hours)", details: "Einstein's theory of matter radiation interaction, A and B coefficients, population inversion, types of lasers (He-Ne, ruby), properties of laser beams, applications." }
+                ],
+                topics: [
+                    { title: "High Yield Exam Topics", details: "Schrodinger wave equation, Maxwell's equations derivations, Newton's rings experiment, Population inversion in Lasers." }
+                ]
+            },
+            maths: {
+                syllabus: [
+                    { title: "Unit I: Calculus-I (10 Hours)", details: "Evolutes and involutes; Evaluation of definite and improper integrals; Beta and Gamma functions; Applications of definite integrals to evaluate surface areas and volumes." },
+                    { title: "Unit II: Calculus-II (10 Hours)", details: "Rolle's Theorem, Mean value theorems, Taylor's and Maclaurin theorems; indeterminate forms and L'Hospital's rule; Maxima and minima." },
+                    { title: "Unit III: Sequences and series (10 Hours)", details: "Convergence of sequence and series, tests for convergence; Power series, Taylor's series, Fourier series: Half range sine and cosine series, Parseval's theorem." },
+                    { title: "Unit IV: Multivariable Calculus (10 Hours)", details: "Limit, continuity and partial derivatives, directional derivatives; Tangent plane and normal line; Maxima, minima and saddle points; Method of Lagrange multipliers." },
+                    { title: "Unit V: Matrices (8 Hours)", details: "Inverse and rank of a matrix, rank-nullity theorem; System of linear equations; Eigenvalues and eigenvectors; Diagonalization of matrices; Cayley-Hamilton Theorem." }
+                ],
+                topics: [
+                    { title: "Important Exam Questions", details: "Eigenvalues and eigenvectors, Cayley-Hamilton theorem, Lagrange multipliers, Fourier series expansions, Taylor's & Maclaurin theorems." }
+                ]
+            },
+            english: {
+                syllabus: [
+                    { title: "UNIT 1: Vocabulary Building (6 Hours)", details: "The concept of Word Formation, Root words from foreign languages, prefixes and suffixes, Synonyms, antonyms, and standard abbreviations." },
+                    { title: "UNIT 2: Basic Writing Skills (6 Hours)", details: "Sentence Structures, Use of phrases and clauses, Importance of proper punctuation, Creating coherence, Organizing principles of paragraphs, Techniques for writing precisely." },
+                    { title: "UNIT 3: Identifying Common Errors in Writing (6 Hours)", details: "Subject-verb agreement, Noun-pronoun agreement, Misplaced modifiers, Articles, Prepositions, Redundancies, Clichés." },
+                    { title: "UNIT 4: Nature and Style of sensible Writing (6 Hours)", details: "Describing, Defining, Classifying, Providing examples or evidence, Writing introduction and conclusion." },
+                    { title: "UNIT 5: Writing Practices and Oral Communication (6 Hours)", details: "Comprehension, Précis Writing, Essay Writing. Oral Communication: Listening Comprehension, Pronunciation, Intonation, Stress and Rhythm, Interviews, Formal Presentations." }
+                ],
+                topics: [
+                    { title: "Key Focus Areas", details: "Spotting errors (Subject-verb agreement, modifiers), Précis writing format, Vocabulary and root words, Essay structures." }
+                ]
+            },
+            electrical: {
+                syllabus: [
+                    { title: "UNIT 1: DC Circuits (9 hours)", details: "Electrical circuit elements (R, L and C), voltage and current sources, Kirchhoff's current and voltage laws, Superposition, Thevenin and Norton Theorems." },
+                    { title: "UNIT 2: AC Circuits (9 hours)", details: "Representation of sinusoidal waveforms, RMS square values, phasor representation, real power, reactive power, apparent power, power factor, Resonance, star and delta connections." },
+                    { title: "UNIT 3: Transformers (9 hours)", details: "Principle of operation and construction of single phase transformers, losses, efficiency and voltage regulation, Magnetic materials, BH characteristics." },
+                    { title: "UNIT 4: Electrical Machines (9 hours)", details: "Generation of rotating magnetic fields, Single phase and three-phase induction motor, torque slip characteristic, Types of DC motors, Necessity of starter." },
+                    { title: "UNIT 5: Power Source (9 hours)", details: "Introduction to Wind, Solar, Fuel cell, Tidal, Geo-Thermal, Hydroelectric, Thermal-Steam, diesel, gas, nuclear power plants; Types of batteries." }
+                ],
+                topics: [
+                    { title: "Crucial Derivations & Numericals", details: "Thevenin's theorem numericals, KVL & KCL mesh analysis, Transformer efficiency equations, AC resonance circuits." }
+                ]
+            }
+        };
+
+        let currentSubject = '';
+        let currentSubTab = 'syllabus';
+        let isEditMode = false;
+        let appData = defaultData;
+
+        // Save data to Firebase
+        function saveToFirebase() {
+            set(syllabusRef, appData);
+        }
+
+        // Realtime Data Sync from Firebase
+        onValue(syllabusRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                appData = data;
+            } else {
+                saveToFirebase(); // Seed database with default data if empty
+            }
+            renderContent();
+        });
+
+        // Global functions for UI interaction
+        window.selectSubject = function(subjectKey, element) {
+            currentSubject = subjectKey;
+            document.querySelectorAll('.subject-card').forEach(card => card.classList.remove('active'));
+            if(element) element.classList.add('active');
+
+            document.getElementById('content-panel').classList.add('active');
+            renderContent();
+        };
+
+        window.switchSubTab = function(tabName, element) {
+            currentSubTab = tabName;
+            document.querySelectorAll('.sub-btn').forEach(btn => btn.classList.remove('active'));
+            if(element) element.classList.add('active');
+
+            document.getElementById('tab-syllabus').style.display = tabName === 'syllabus' ? 'block' : 'none';
+            document.getElementById('tab-topics').style.display = tabName === 'topics' ? 'block' : 'none';
+            renderContent();
+        };
+
+        function renderContent() {
+            if(!currentSubject) return;
+
+            const syllabusContainer = document.getElementById('tab-syllabus');
+            const topicsContainer = document.getElementById('tab-topics');
+
+            syllabusContainer.innerHTML = generateHTMLList(appData[currentSubject]?.syllabus || [], 'syllabus');
+            topicsContainer.innerHTML = generateHTMLList(appData[currentSubject]?.topics || [], 'topics');
+
+            document.getElementById('add-btn-container').style.display = isEditMode ? 'block' : 'none';
+        }
+
+        function generateHTMLList(items, type) {
+            if(!items || items.length === 0) return `<p style="color:var(--text-muted)">No items found. Click 'Edit Mode' to add some.</p>`;
+
+            return items.map((item, index) => `
+                <div class="section-block">
+                    <h4 contenteditable="${isEditMode}" onblur="updateData('${type}', ${index}, 'title', this.innerText)">${item.title}</h4>
+                    <p contenteditable="${isEditMode}" onblur="updateData('${type}', ${index}, 'details', this.innerText)">${item.details}</p>
+                    ${isEditMode ? `<button class="delete-btn" onclick="deleteItem('${type}',${index})">🗑️ Delete</button>` : ''}
+                </div>
+            `).join('');
+        }
+
+        window.updateData = function(type, index, key, text) {
+            if (!appData[currentSubject][type][index]) return;
+            appData[currentSubject][type][index][key] = text;
+            saveToFirebase();
+        };
+
+        window.addNewBlock = function() {
+            if(!currentSubject) return;
+            if(!appData[currentSubject][currentSubTab]) {
+                appData[currentSubject][currentSubTab] = [];
+            }
+            appData[currentSubject][currentSubTab].push({
+                title: "New Title (Edit Me)",
+                details: "Type the details here..."
+            });
+            saveToFirebase();
+            renderContent();
+        };
+
+        window.deleteItem = function(type, index) {
+            if(confirm("Are you sure you want to delete this item?")) {
+                appData[currentSubject][type].splice(index, 1);
+                saveToFirebase();
+                renderContent();
+            }
+        };
+
+        window.toggleEditMode = function() {
+            isEditMode = !isEditMode;
+            const btn = document.getElementById('edit-toggle-btn');
+            if(isEditMode) {
+                btn.innerText = "✏️ Edit Mode: ON";
+                btn.classList.add('btn-active');
+            } else {
+                btn.innerText = "✏️ Edit Mode: OFF";
+                btn.classList.remove('btn-active');
+            }
+            renderContent();
+        };
+
+        window.exportData = function() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "sem1_updated_syllabus.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        };
+
+        window.resetDefault = function() {
+            if(confirm("Are you sure you want to reset all modifications back to default? All your custom topics will be lost!")) {
+                appData = JSON.parse(JSON.stringify(defaultData));
+                saveToFirebase();
+                renderContent();
+            }
+        };
+    </script>
+</body>
+</html>
